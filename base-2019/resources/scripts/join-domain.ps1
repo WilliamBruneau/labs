@@ -34,3 +34,5 @@ Set-Service wuauserv -StartupType Disabled
 Stop-Service wuauserv
 Set-Service TrustedInstaller -StartupType Disabled
 Stop-Service TrustedInstaller
+
+gpupdate /force
