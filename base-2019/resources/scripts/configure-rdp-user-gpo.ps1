@@ -1,6 +1,20 @@
 # Purpose: Install the GPO that allows windomain\vagrant to RDP
+
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Importing the GPO to allow windomain/vagrant to RDP..."
-Import-GPO -BackupGpoName 'Allow Domain Users RDP' -Path "c:\vagrant\resources\GPO\rdp_users" -TargetName 'Allow Domain Users RDP' -CreateIfNeeded
+# Fix generic GPO using the current domain SID
+$DomainSID = (Get-ADDomain).DomainSid.Value
+gci -r -Path c:\vagrant\resources\GPO\rdp_users\ | foreach-object {
+  if ( -not $_.PSIsContainer ) {
+    $a = $_.FullName;
+    $b = $a -replace 'c:\\vagrant\\resources\\GPO\\rdp_users','c:\tmp\rdp_users'
+    New-Item -Path $b -Type file -Force | Out-Null
+    gc $a | foreach-object {
+      $_ -replace "S-1-5-21-2442050065-1280348291-2767644839",$DomainSID
+    }  | set-content $b
+  }
+}
+Import-GPO -BackupGpoName 'Allow Domain Users RDP' -Path 'c:\tmp\rdp_users\' -TargetName 'Allow Domain Users RDP' -CreateIfNeeded
+del -Force -Recurse 'c:\tmp\rdp_users\'
 
 $OU = "ou=Workstations,dc=windomain,dc=local"
 $gPLinks = $null
