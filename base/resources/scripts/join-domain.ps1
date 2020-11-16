@@ -17,8 +17,8 @@ $DomainCred = New-Object System.Management.Automation.PSCredential $user, $pass
 # Place the computer in the correct OU based on hostname
 If ($hostname -eq "srv") {
   Add-Computer -DomainName "windomain.local" -credential $DomainCred -OUPath "ou=Servers,dc=windomain,dc=local" -PassThru
-} ElseIf ($hostname -eq "win10") {
-  Write-Host "Adding Win10 to the domain. Sometimes this step times out. If that happens, just run 'vagrant reload win10 --provision'" #debug
+} ElseIf ($hostname -eq "client") {
+  Write-Host "Adding client to the domain. Sometimes this step times out. If that happens, just run 'vagrant reload client --provision'" #debug
   Add-Computer -DomainName "windomain.local" -credential $DomainCred -OUPath "ou=Workstations,dc=windomain,dc=local"
 } Else {
   Add-Computer -DomainName "windomain.local" -credential $DomainCred -PassThru
